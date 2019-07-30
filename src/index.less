@@ -11,6 +11,7 @@
 
   .router-pages {
     .router-page {
+      display   : none;
       position  : fixed;
       top       : 0;
       left      : 0;
@@ -18,6 +19,10 @@
       height    : 100vh;
       background: #ffffff;
       z-index   : 10;
+
+      &:last-child {
+        display: block;
+      }
     }
   }
 
