@@ -1,31 +1,19 @@
-# react-router-webapp
+#### 运行
+npm run start
+cd ./example
+npm run start
 
-> webApp router
+#### API
+- switchTab(path) 选择回到主页
+- navigateTo(path) 页面入栈
 
-[![NPM](https://img.shields.io/npm/v/react-router-webapp.svg)](https://www.npmjs.com/package/react-router-webapp) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+#### 组件
+- tabbar(可自定义)
 
-## Install
 
-```bash
-npm install --save react-router-webapp
-```
-
-## Usage
-
-```jsx
-import React, { Component } from 'react'
-
-import MyComponent from 'react-router-webapp'
-
-class Example extends Component {
-  render () {
-    return (
-      <MyComponent />
-    )
-  }
-}
-```
-
-## License
-
-MIT © [](https://github.com/)
+#### 待修复
+- 路由匹配未完善
+- title、页面自由修改API
+- 自测
+- history文件优化
+- 多余代码删除
