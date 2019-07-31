@@ -15,6 +15,7 @@ export default class History {
   constructor (mode, createHistoryOptions, listen, tabBar, pages) {
     this.stack = []
     this.tabBar = arrRegexpPath(tabBar)
+    this.tabBarMap = arr2map(this.tabBar, 'path')
     this._inittabBarRenderContent()
     this.pages = arrRegexpPath(pages)
     this.history = createHistoryMap[mode](createHistoryOptions)
@@ -30,18 +31,38 @@ export default class History {
   }
   _listen = listen => {
     this.unlisten = this.history.listen((location, action) => {
-      this._setSelected(location, action)
-      this._setStack(location, action)
-      this._onPop(location, action)
-      listen(this.selected, location, action)
+      if (!this._stop) {
+        this._setSelected(location, action)
+        this._setStack(location, action)
+        this._onPop(location, action)
+        listen(this.selected, location, action)
+      }
+      this._stop = false
+      console.log(action, location, this.history)
     })
   }
   _onPop = (location, action) => {
     if (action === 'POP') {
-      this.stack.splice(this.stack.length - 1, 1)
-      if (this.stack.length) {
-        let showRef = this.stack[this.stack.length - 1].ref.onShow
-        showRef && showRef()
+      // stack-page
+      console.log(this.tabBarMap, location.pathname)
+      if (
+        this.tabBarMap[location.pathname] ||
+        (this.stack.length - 1 > 0 &&
+          this.stack[this.stack.length - 2].path === location.pathname)
+      ) {
+        // back
+        console.log('后退')
+        this.stack.splice(this.stack.length - 1, 1)
+        if (this.stack.length) {
+          let showRef = this.stack[this.stack.length - 1].ref.onShow
+          showRef && showRef()
+        }
+      } else {
+        // forword
+        this._stop = true
+        this.history.goBack()
+
+        console.log('前进')
       }
     }
   }
@@ -72,6 +93,7 @@ export default class History {
           obj.ref = ele
         }
       })
+      obj.path = location.pathname
       if (action === 'PUSH') {
         this.stack.push(obj)
       } else if (action === 'REPLACE') {
@@ -115,4 +137,12 @@ function arrRegexpPath (arr) {
     ...it,
     regexp: pathToRegexp(it.path)
   }))
+}
+
+function arr2map (arr, key) {
+  let obj = {}
+  arr.forEach(it => {
+    obj[it[key]] = it
+  })
+  return obj
 }
