@@ -39,6 +39,8 @@ export default class History {
   _onPop = (location, action) => {
     if (action === 'POP') {
       this.stack.splice(this.stack.length - 1, 1)
+      let showRef = this.stack[this.stack.length - 1].ref.onShow
+      showRef && showRef()
     }
   }
   _setSelected = location => {
