@@ -10,7 +10,7 @@ export default class RouterTabBar extends Component {
       list,
       history: { config, selected, switchTab, tabBar }
     } = this.props
-    console.log('render tabbar')
+    // console.log('render tabbar')
     // console.log(this)
     return (
       <TabBar {...config}>

@@ -3,11 +3,11 @@ export default class List extends Component {
   onClick = () => {
     this.history.goHome()
   }
-  onShow = ()=>{
-    console.log('list-show')
+  onShow = () => {
+    // console.log('list-show')
   }
-  onHide = ()=>{
-    console.log('list-hide')
+  onHide = () => {
+    // console.log('list-hide')
   }
   render () {
     const { history } = this.props

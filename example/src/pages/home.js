@@ -9,10 +9,10 @@ export default class Home extends Component {
   }
   componentWillMount () {}
   onHide = () => {
-    console.log('home_hide')
+    // console.log('home_hide')
   }
   onShow = () => {
-    console.log('home_show')
+    // console.log('home_show')
   }
   render () {
     const { history } = this.props

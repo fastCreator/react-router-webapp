@@ -31,7 +31,7 @@ export default class Router extends Component {
   }
   render () {
     const { history } = this
-    console.log('render route')
+    // console.log('render route')
     // console.log(this)
     // const { Component } = this.state
     const child = React.Children.only(this.props.children)

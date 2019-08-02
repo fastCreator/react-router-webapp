@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 export default class User extends Component {
   onShow () {
-    console.log('user-show')
+    // console.log('user-show')
   }
   render () {
     return (

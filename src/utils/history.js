@@ -19,55 +19,63 @@ export default class History {
     this._inittabBarRenderContent()
     this.pages = arrRegexpPath(pages)
     this.history = createHistoryMap[mode](createHistoryOptions)
+    this._init()
     this._listen(listen)
-    this._setSelected(this.history.location)
-    this._setStack(this.history.location, 'PUSH')
-    if (!this.selected) {
+  }
+  _init () {
+    let path = this.history.location.pathname
+    if (this.tabBarMap[path]) {
+      this._setSelected(path)
+    } else {
       this.selected = this.tabBar[0]
+      this._setStack(path, 'PUSH')
+      this.num = 1
     }
-    // this.history.replace(
-    //   this.history.pathname + this.history.search + this.history.hash
-    // )
   }
   _listen = listen => {
     this.unlisten = this.history.listen((location, action) => {
+      console.log(action, location, this.history)
       if (!this._stop) {
-        this._setSelected(location, action)
-        this._setStack(location, action)
-        this._onPop(location, action)
+        let path = location.pathname
+        this._setSelected(path, action)
+        this._setStack(path, action)
+        this._onPop(path, action)
         listen(this.selected, location, action)
       }
       this._stop = false
-      console.log(action, location, this.history)
     })
   }
-  _onPop = (location, action) => {
+  _onPop = (path, action) => {
     if (action === 'POP') {
-      // stack-page
-      console.log(this.tabBarMap, location.pathname)
-      if (
-        this.tabBarMap[location.pathname] ||
-        (this.stack.length - 1 > 0 &&
-          this.stack[this.stack.length - 2].path === location.pathname)
-      ) {
-        // back
-        console.log('后退')
-        this.stack.splice(this.stack.length - 1, 1)
-        if (this.stack.length) {
-          let showRef = this.stack[this.stack.length - 1].ref.onShow
-          showRef && showRef()
-        }
+      let page = this.stack.find(it => it.regexp.exec(path))
+      if (page) {
+        let index = this.stack.indexOf(page)
+        this.stack = this.stack.slice(0, index + 1)
       } else {
-        // forword
-        this._stop = true
-        this.history.goBack()
-
-        console.log('前进')
+        this.stack = []
       }
+      // console.log(page)
+      // // stack-page
+      // if (
+      //   this.tabBarMap[path] ||
+      //   (this.stack.length - 1 > 0 &&
+      //     this.stack[this.stack.length - 2].path === path)
+      // ) {
+      //   // back
+      //   this.stack.splice(this.stack.length - 1, 1)
+      //   if (this.stack.length) {
+      //     let showRef = this.stack[this.stack.length - 1].ref.onShow
+      //     showRef && showRef()
+      //   }
+      // } else {
+      //   // forword
+      //   this._stop = true
+      //   // this.history.goBack()
+      // }
     }
   }
-  _setSelected = location => {
-    let tabbar = this.tabBar.find(it => it.regexp.exec(location.pathname))
+  _setSelected = path => {
+    let tabbar = this.tabBarMap[path]
     if (tabbar) {
       if (this.selected) {
         let selected = this.selected
@@ -83,8 +91,8 @@ export default class History {
       }, 0)
     }
   }
-  _setStack = (location, action) => {
-    let page = this.pages.find(it => it.regexp.exec(location.pathname))
+  _setStack = (path, action) => {
+    let page = this.pages.find(it => it.regexp.exec(path))
     if (page) {
       let obj = {}
       obj.ele = React.createElement(page.component, {
@@ -93,12 +101,16 @@ export default class History {
           obj.ref = ele
         }
       })
-      obj.path = location.pathname
+      Object.assign(obj, page)
       if (action === 'PUSH') {
         this.stack.push(obj)
       } else if (action === 'REPLACE') {
         this.stack.splice(this.stack.length - 1, 1, obj)
       }
+    } else if (this.tabBarMap[path]) {
+      this.stack = []
+    } else {
+      console.error('404')
     }
   }
   _inittabBarRenderContent = tabBar => {
@@ -111,14 +123,14 @@ export default class History {
       })
     })
   }
-  navigateBack = num => {
+  navigateBack = (num = 1) => {
     if (num) {
       this.history.go(-num)
-      this.stack.splice(this.stack.length - num, num)
     }
   }
   switchTab = path => {
-    this.navigateBack(this.stack.length)
+    let clearLen = this.stack.length
+    clearLen && this.history.go(-clearLen)
     this.history.replace(path)
   }
   redirectTo = path => {
