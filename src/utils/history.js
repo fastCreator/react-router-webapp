@@ -19,8 +19,8 @@ export default class History {
     this._inittabBarRenderContent()
     this.pages = arrRegexpPath(pages)
     this.history = createHistoryMap[mode](createHistoryOptions)
-    this._init()
     this._listen(listen)
+    this._init()
   }
   _init () {
     let path = this.history.location.pathname
@@ -28,21 +28,19 @@ export default class History {
       this._setSelected(path)
     } else {
       this.selected = this.tabBar[0]
-      this._setStack(path, 'PUSH')
-      this.num = 1
+      setTimeout(() => {
+        this.history.replace(this.selected.path)
+        this.history.push(path)
+      }, 0)
     }
   }
   _listen = listen => {
     this.unlisten = this.history.listen((location, action) => {
-      console.log(action, location, this.history)
-      if (!this._stop) {
-        let path = location.pathname
-        this._setSelected(path, action)
-        this._setStack(path, action)
-        this._onPop(path, action)
-        listen(this.selected, location, action)
-      }
-      this._stop = false
+      let path = location.pathname
+      this._setSelected(path, action)
+      this._setStack(path, action)
+      this._onPop(path, action)
+      listen(this.selected, location, action)
     })
   }
   _onPop = (path, action) => {
@@ -54,24 +52,6 @@ export default class History {
       } else {
         this.stack = []
       }
-      // console.log(page)
-      // // stack-page
-      // if (
-      //   this.tabBarMap[path] ||
-      //   (this.stack.length - 1 > 0 &&
-      //     this.stack[this.stack.length - 2].path === path)
-      // ) {
-      //   // back
-      //   this.stack.splice(this.stack.length - 1, 1)
-      //   if (this.stack.length) {
-      //     let showRef = this.stack[this.stack.length - 1].ref.onShow
-      //     showRef && showRef()
-      //   }
-      // } else {
-      //   // forword
-      //   this._stop = true
-      //   // this.history.goBack()
-      // }
     }
   }
   _setSelected = path => {
